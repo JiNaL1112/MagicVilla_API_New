@@ -14,53 +14,14 @@ namespace MagicVilla_VillaAPI.Repository
             _db = db;
         }
 
-        public async Task<List<Villa>> GetAllAsync(Expression<Func<Villa, bool>> filter = null)
+        public async Task<Villa> UpdateAsync(Villa entity)
         {
-            IQueryable<Villa> query = _db.Villas;
-            if (filter != null)
-                query = query.Where(filter);
-
-            return await query.ToListAsync();
-        }
-
-        public async Task<Villa> GetAsync(Expression<Func<Villa, bool>> filter = null, bool tracked = true)
-        {
-            IQueryable<Villa> query = _db.Villas;
-            if (!tracked)
-            {
-                query = query.AsNoTracking();
-            }
-
-            if (filter != null)
-                query = query.Where(filter);
-
-            return await query.FirstOrDefaultAsync();
-        }
-        public async Task CreateAsync(Villa villa)
-        {
-            await _db.Villas.AddAsync(villa);
-            await SaveChanges();
-
-        }
-
-        public async Task UpdateAsync(Villa villa)
-        {
-             _db.Villas.Update(villa);
-            await SaveChanges();
-
-        }
-
-        public async Task RemoveAsync(Villa villa)
-        {
-            _db.Villas.Remove(villa);
-            await SaveChanges();
-        }
-
-
-        public async Task SaveChanges()
-        {
+            entity.UpdatedDate = DateTime.Now;
+            _db.Villas.Update(entity);
             await _db.SaveChangesAsync();
+            return entity;
         }
+
 
     }
 }
