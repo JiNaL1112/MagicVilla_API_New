@@ -89,18 +89,22 @@ namespace MagicVilla_VillaAPI.Controllers
         }
 
 
+       
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<APIResponse>> CreateVilla([FromBody] VillaCreateDTO createDTO)
         {
             try
             {
-
-                if (_villaRepository.GetAsync(u => u.Name.ToLower() == createDTO.Name.ToLower()) != null)
+                //if (!ModelState.IsValid)
+                //{
+                //    return BadRequest(ModelState);
+                //}
+                if (await _villaRepository.GetAsync(u => u.Name.ToLower() == createDTO.Name.ToLower()) != null)
                 {
-                    ModelState.AddModelError("CustomError", "Villa already Exists!");
+                    ModelState.AddModelError("ErrorMessages", "Villa already Exists!");
                     return BadRequest(ModelState);
                 }
 
@@ -108,24 +112,34 @@ namespace MagicVilla_VillaAPI.Controllers
                 {
                     return BadRequest(createDTO);
                 }
-
+                //if (villaDTO.Id > 0)
+                //{
+                //    return StatusCode(StatusCodes.Status500InternalServerError);
+                //}
                 Villa villa = _mapper.Map<Villa>(createDTO);
 
+                //Villa model = new()
+                //{
+                //    Amenity = createDTO.Amenity,
+                //    Details = createDTO.Details,
+                //    ImageUrl = createDTO.ImageUrl,
+                //    Name = createDTO.Name,
+                //    Occupancy = createDTO.Occupancy,
+                //    Rate = createDTO.Rate,
+                //    Sqft = createDTO.Sqft
+                //};
                 await _villaRepository.CreateAsync(villa);
-
-                _response.Result = villa;
+                _response.Result = _mapper.Map<VillaDTO>(villa);
                 _response.StatusCode = HttpStatusCode.Created;
-
                 return CreatedAtRoute("GetVilla", new { id = villa.Id }, _response);
             }
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string> { ex.Message };
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
             }
-
             return _response;
-
         }
 
         [HttpDelete("{id:int}", Name = "DeleteVilla")]
