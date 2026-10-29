@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Net;
-using MagicVilla_VillaAPI.Models.Dto;
 using Microsoft.AspNetCore.JsonPatch;
 
-namespace MagicVilla_VillaAPI.Controllers
+namespace MagicVilla_VillaAPI.Controllers.v1
 {
-    [Route("api/VillaNumberAPI")]
+    [Route("api/v{version:apiVersion}/VillaNumberAPI")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class VillaNumberAPIController : ControllerBase
     {
         protected APIResponse _response;
@@ -20,12 +20,12 @@ namespace MagicVilla_VillaAPI.Controllers
         private readonly IVillaRepository _villaRepository;
         private readonly IVillaNumberRepository _villaNumberRepository;
         public VillaNumberAPIController(IVillaNumberRepository villaNumberRepository,
-            IVillaRepository villaRepository,IMapper mapper)
+            IVillaRepository villaRepository, IMapper mapper)
         {
             _villaNumberRepository = villaNumberRepository;
             _villaRepository = villaRepository;
             _mapper = mapper;
-            this._response = new();
+            _response = new();
         }
 
         [HttpGet]
